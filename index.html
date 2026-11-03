@@ -1,0 +1,128 @@
+
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SVETLINA Simulator</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      padding: 24px;
+      font-family: Arial, sans-serif;
+      background: #101827;
+      color: #f5f7fb;
+    }
+    main {
+      max-width: 600px;
+      margin: 30px auto;
+    }
+    h1 { color: #f5c76b; }
+    .panel {
+      background: #1d293b;
+      padding: 22px;
+      border-radius: 16px;
+      margin-top: 20px;
+    }
+    label { display: block; margin-top: 16px; }
+    input {
+      width: 100%;
+      padding: 13px;
+      margin-top: 7px;
+      border: 1px solid #526078;
+      border-radius: 8px;
+      font-size: 17px;
+    }
+    button {
+      width: 100%;
+      padding: 15px;
+      margin-top: 22px;
+      background: #f5c76b;
+      border: 0;
+      border-radius: 8px;
+      font-size: 17px;
+      font-weight: bold;
+    }
+    .result {
+      margin-top: 20px;
+      padding: 18px;
+      background: #26364c;
+      border-radius: 10px;
+      line-height: 1.8;
+    }
+    .muted { color: #bdc8d8; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>SVETLINA</h1>
+    <p class="muted">Business Impact Simulator</p>
+
+    <section class="panel">
+      <h2>Тествай бъдещето на бизнеса си</h2>
+      <p class="muted">Въведи месечните финансови данни.</p>
+
+      <label for="revenue">Месечни приходи (€)</label>
+      <input id="revenue" type="number" min="0" step="0.01" value="30000">
+
+      <label for="expenses">Месечни разходи (€)</label>
+      <input id="expenses" type="number" min="0" step="0.01" value="20000">
+
+      <label for="decline">Спад на приходите (%)</label>
+      <input id="decline" type="number" min="0" max="100" step="1" value="20">
+
+      <button onclick="simulate()">СИМУЛИРАЙ ПРОМЯНАТА</button>
+
+      <div class="result" id="result" aria-live="polite">
+        Резултатът ще се появи тук.
+      </div>
+    </section>
+  </main>
+
+  <script>
+    function simulate() {
+      const revenue = Number(document.getElementById("revenue").value);
+      const expenses = Number(document.getElementById("expenses").value);
+      const decline = Number(document.getElementById("decline").value);
+      const result = document.getElementById("result");
+
+      if (
+        !Number.isFinite(revenue) ||
+        !Number.isFinite(expenses) ||
+        !Number.isFinite(decline) ||
+        revenue < 0 ||
+        expenses < 0 ||
+        decline < 0 ||
+        decline > 100 ||
+        document.getElementById("revenue").value === "" ||
+        document.getElementById("expenses").value === "" ||
+        document.getElementById("decline").value === ""
+      ) {
+        result.textContent =
+          "Моля, въведи валидни стойности. Спадът трябва да е между 0 и 100%.";
+        return;
+      }
+
+      const newRevenue = revenue * (1 - decline / 100);
+      const oldProfit = revenue - expenses;
+      const newProfit = newRevenue - expenses;
+      const difference = newProfit - oldProfit;
+
+      const money = value =>
+        value.toLocaleString("bg-BG", {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2
+        }) + " €";
+
+      result.innerHTML = `
+        <h3>Резултат от симулацията</h3>
+        Приходи след промяната: <b>${money(newRevenue)}</b><br>
+        Резултат преди промяната: <b>${money(oldProfit)}</b><br>
+        Резултат след промяната: <b>${money(newProfit)}</b><br>
+        Промяна в резултата: <b>${money(difference)}</b>
+      `;
+    }
+  </script>
+</body>
+</html>
